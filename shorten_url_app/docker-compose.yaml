@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: shorten_url_app
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./data:/app/data
+    restart: always
