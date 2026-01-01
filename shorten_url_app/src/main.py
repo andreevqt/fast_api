@@ -16,7 +16,7 @@ def shorten_url(long_url):
     return hashlib.md5(long_url.encode()).hexdigest()[:14]
 
 @app.post("/shorten/")
-async def create(dto: UrlDto, session: SessionDep):
+async def shorten_url(dto: UrlDto, session: SessionDep):
     shorten = shorten_url(dto.url)
     model = Url.model_validate(dto, update={"shorten": shorten, "full": dto.url})
     session.add(model)
@@ -24,7 +24,7 @@ async def create(dto: UrlDto, session: SessionDep):
     return shorten
 
 @app.get("/{shorten}")
-async def create(shorten: str, session: SessionDep):
+async def process_url(shorten: str, session: SessionDep):
     model = session.exec(select(Url).where(Url.shorten == shorten)).first()
     if not model:
         raise HTTPException(status_code=404, detail="Url not found")
@@ -32,7 +32,7 @@ async def create(shorten: str, session: SessionDep):
     return RedirectResponse(model.full);
 
 @app.get("/stats/{shorten}")
-async def create(shorten: str, session: SessionDep) -> Url:
+async def get(shorten: str, session: SessionDep) -> Url:
     model = session.exec(select(Url).where(Url.shorten == shorten)).first()
     if not model:
         raise HTTPException(status_code=404, detail="Url not found")
